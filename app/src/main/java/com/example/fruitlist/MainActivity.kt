@@ -3,13 +3,14 @@ package com.example.fruitlist
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.random.Random
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
     private val fruitList = generateDummyList(100)
-    private val adapter = FruitAdapter(fruitList)
+    private val adapter = FruitAdapter(fruitList, this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -33,6 +34,13 @@ class MainActivity : AppCompatActivity() {
         val index = Random.nextInt(8)
         fruitList.removeAt(index)
         adapter.notifyItemRemoved(index)
+    }
+
+    override fun onItemClick(position: Int) {
+        Toast.makeText(this, "Item $position clicked", Toast.LENGTH_SHORT).show()
+        val clickedItem = fruitList[position]
+        clickedItem.name = "Clicado"
+        adapter.notifyItemChanged(position)
     }
 
     private fun generateDummyList(size: Int): ArrayList<Fruit> {

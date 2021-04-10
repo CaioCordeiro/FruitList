@@ -3,4 +3,4 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Fruit (val imageResource: Int, val name:String, val summary:String):Parcelable
+data class Fruit (val imageResource: Int, var name:String, var summary:String):Parcelable
