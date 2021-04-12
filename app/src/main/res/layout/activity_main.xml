@@ -24,12 +24,12 @@
         android:layout_alignParentBottom="true">
 
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="insertItem"
-            android:text="Insert Fruit" />
+<!--        <Button-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_weight="1"-->
+<!--            android:onClick="insertItem"-->
+<!--            android:text="Insert Fruit" />-->
 
         <Button
             android:layout_width="match_parent"
@@ -38,5 +38,12 @@
             android:onClick="removeItem"
             android:text="Remove Fruit" />
     </LinearLayout>
-
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/AddFruit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:src="@drawable/ic_baseline_add_24"
+        android:contentDescription="AddFruit"
+        android:layout_margin="16dp" />
 </RelativeLayout>
