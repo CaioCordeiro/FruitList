@@ -15,6 +15,13 @@ import kotlin.random.Random
 class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
     companion object {
         const val MAIN_ACTIVITY_INSERT_FRUIT_REQUEST_CODE = 1
+        const val MAIN_ACTIVITY_DELETE_FRUIT_REQUEST_CODE = 2
+        const val MAIN_ACTIVITY_EDIT_FRUIT_REQUEST_CODE = 2
+        const val MAIN_ACTIVITY_EDIT_FRUIT_POSITION_EXTRA = "position"
+        const val MAIN_ACTIVITY_EDIT_FRUIT_NAME_EXTRA = "name"
+        const val MAIN_ACTIVITY_EDIT_FRUIT_SUMMARY_EXTRA = "summary"
+        const val MAIN_ACTIVITY_EDIT_FRUIT_IMAGE_RESOURCE_EXTRA = "image_resource"
+
         const val MAIN_ACTIVITY_INSERT_FRUIT_RESULT = "insert_fruit_extra"
     }
 
@@ -43,6 +50,15 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
                     val imageResouce = getIntExtra(CreateFruitActivity.RESULT_IMAGE_RESOURCE, 1)
                     if (name != null && sumary != null)
                         insertItem(imageResouce, name, sumary)
+                }
+            }
+            if (MAIN_ACTIVITY_EDIT_FRUIT_REQUEST_CODE == requestCode) {
+                data.apply {
+                    val name = getStringExtra(EditFruitActivity.RESULT_NAME)
+                    val summary = getStringExtra(EditFruitActivity.RESULT_SUMMARY)
+                    val imageResource = getIntExtra(EditFruitActivity.RESULT_IMAGE_RESOURCE, 1)
+                    val position = getIntExtra(EditFruitActivity.RESULT_POSITION, 0)
+                    editItem(imageResource, name, summary, position)
                 }
             }
         }
@@ -74,11 +90,31 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
         adapter.notifyItemRemoved(index)
     }
 
+    fun editItem(imageResource: Int, name: String?, summary: String?, position: Int) {
+        val clickedItem = fruitList[position]
+        if (name != null)
+            clickedItem.name = name
+        if (summary != null)
+            clickedItem.summary = summary
+        if (imageResource != null)
+            clickedItem.imageResource = imageResource
+        adapter.notifyItemChanged(position)
+    }
+
     override fun onItemClick(position: Int) {
         Toast.makeText(this, "Item $position clicked", Toast.LENGTH_SHORT).show()
         val clickedItem = fruitList[position]
-        clickedItem.name = "Clicado"
-        adapter.notifyItemChanged(position)
+//        clickedItem.name = "Clicado"
+//        adapter.notifyItemChanged(position)
+        val editFruitActivity = Intent(this, EditFruitActivity::class.java)
+        editFruitActivity.putExtra(MAIN_ACTIVITY_EDIT_FRUIT_POSITION_EXTRA, position)
+        editFruitActivity.putExtra(MAIN_ACTIVITY_EDIT_FRUIT_NAME_EXTRA, clickedItem.name)
+        editFruitActivity.putExtra(MAIN_ACTIVITY_EDIT_FRUIT_SUMMARY_EXTRA, clickedItem.summary)
+        editFruitActivity.putExtra(
+            MAIN_ACTIVITY_EDIT_FRUIT_IMAGE_RESOURCE_EXTRA,
+            clickedItem.imageResource
+        )
+        startActivityForResult(editFruitActivity, MAIN_ACTIVITY_EDIT_FRUIT_REQUEST_CODE)
     }
 
     private fun generateDummyList(size: Int): ArrayList<Fruit> {

@@ -9,7 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FruitList">
-        <activity android:name=".CreateFruitActivity"></activity>
+        <activity
+            android:name=".EditFruitActivity"
+            android:label="@string/title_activity_edit_fruit"></activity>
+
+        <activity android:name=".CreateFruitActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
