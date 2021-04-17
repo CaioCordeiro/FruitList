@@ -10,40 +10,18 @@
         android:id="@+id/recycle_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/buttons"
         android:clipToPadding="false"
         android:padding="4dp"
         tools:listitem="@layout/fruit_item" />
 
-    <LinearLayout
-        android:id="@+id/buttons"
-        android:padding="4dp"
-        android:clipToPadding="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
-
-
-<!--        <Button-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_weight="1"-->
-<!--            android:onClick="insertItem"-->
-<!--            android:text="Insert Fruit" />-->
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="removeItem"
-            android:text="Remove Fruit" />
-    </LinearLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/AddFruit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
-        android:src="@drawable/ic_baseline_add_24"
         android:contentDescription="AddFruit"
-        android:layout_margin="16dp" />
+        android:src="@drawable/ic_baseline_add_24"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        />
 </RelativeLayout>

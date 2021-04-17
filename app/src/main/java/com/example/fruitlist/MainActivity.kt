@@ -2,6 +2,7 @@ package com.example.fruitlist
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -47,18 +48,26 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
                 data.apply {
                     val name = getStringExtra(CreateFruitActivity.RESULT_NAME)
                     val sumary = getStringExtra(CreateFruitActivity.RESULT_SUMMARY)
-                    val imageResouce = getIntExtra(CreateFruitActivity.RESULT_IMAGE_RESOURCE, 1)
+                    val imageResource = getStringExtra(CreateFruitActivity.RESULT_IMAGE_RESOURCE)
+                    val uriImageResource = Uri.parse(imageResource)
                     if (name != null && sumary != null)
-                        insertItem(imageResouce, name, sumary)
+                        insertItem(uriImageResource, name, sumary)
                 }
             }
             if (MAIN_ACTIVITY_EDIT_FRUIT_REQUEST_CODE == requestCode) {
                 data.apply {
-                    val name = getStringExtra(EditFruitActivity.RESULT_NAME)
-                    val summary = getStringExtra(EditFruitActivity.RESULT_SUMMARY)
-                    val imageResource = getIntExtra(EditFruitActivity.RESULT_IMAGE_RESOURCE, 1)
+                    val action = getStringExtra(EditFruitActivity.RESULT_ACTION)
                     val position = getIntExtra(EditFruitActivity.RESULT_POSITION, 0)
-                    editItem(imageResource, name, summary, position)
+                    if (action != null && "delete".compareTo(action) == 0) {
+                        removeItem(position)
+                    } else {
+                        val name = getStringExtra(EditFruitActivity.RESULT_NAME)
+                        val summary = getStringExtra(EditFruitActivity.RESULT_SUMMARY)
+                        val imageResource = getStringExtra(EditFruitActivity.RESULT_IMAGE_RESOURCE)
+                        val uriImageResource = Uri.parse(imageResource)
+                        editItem(uriImageResource, name, summary, position)
+                    }
+
                 }
             }
         }
@@ -69,14 +78,14 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
 //        startActivityForResult(CreateFruitActivity.newInstance(), MAIN_ACTIVITY_INSERT_FRUIT_REQUEST_CODE)
 //    }
 
-    fun insertItem(imageResource: Int, name: String, summary: String) {
+    fun insertItem(imageResource: Uri, name: String, summary: String) {
 //        val index = Random.nextInt(8)
 //        val newItem = Fruit(
 //            R.drawable.ic_baseline_widgets_24, "New item at position $index",
 //            "Fruta boa, tem gosto de tamarindo, mas tem cor de limão e parece de laranja"
 //        )
         val newItem = Fruit(
-            R.drawable.ic_baseline_widgets_24,
+            imageResource,
             name,
             summary
         )
@@ -84,13 +93,12 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
         adapter.notifyItemInserted(0)
     }
 
-    fun removeItem(view: View) {
-        val index = Random.nextInt(8)
+    fun removeItem(index: Int) {
         fruitList.removeAt(index)
         adapter.notifyItemRemoved(index)
     }
 
-    fun editItem(imageResource: Int, name: String?, summary: String?, position: Int) {
+    fun editItem(imageResource: Uri, name: String?, summary: String?, position: Int) {
         val clickedItem = fruitList[position]
         if (name != null)
             clickedItem.name = name
@@ -112,28 +120,28 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
         editFruitActivity.putExtra(MAIN_ACTIVITY_EDIT_FRUIT_SUMMARY_EXTRA, clickedItem.summary)
         editFruitActivity.putExtra(
             MAIN_ACTIVITY_EDIT_FRUIT_IMAGE_RESOURCE_EXTRA,
-            clickedItem.imageResource
+            clickedItem.imageResource.toString()
         )
         startActivityForResult(editFruitActivity, MAIN_ACTIVITY_EDIT_FRUIT_REQUEST_CODE)
     }
 
-    private fun generateDummyList(size: Int): ArrayList<Fruit> {
-        val list = ArrayList<Fruit>()
-        for (i in 0 until size) {
-            val drawable = when (i % 3) {
-                0 -> R.drawable.ic_baseline_wash_24
-                1 -> R.drawable.ic_baseline_widgets_24
-                else -> R.drawable.ic_baseline_wifi_24
-            }
-            val item = Fruit(
-                drawable,
-                "fruta $i",
-                "É uma fruta ai qualquer uma na vdd é só um teste isso aq ent tanto faz na verdade"
-            )
-            list += item
-        }
-        return list
-    }
+//    private fun generateDummyList(size: Int): ArrayList<Fruit> {
+//        val list = ArrayList<Fruit>()
+//        for (i in 0 until size) {
+//            val drawable = when (i % 3) {
+//                0 -> R.drawable.ic_baseline_wash_24
+//                1 -> R.drawable.ic_baseline_widgets_24
+//                else -> R.drawable.ic_baseline_wifi_24
+//            }
+//            val item = Fruit(
+//                drawable,
+//                "fruta $i",
+//                "É uma fruta ai qualquer uma na vdd é só um teste isso aq ent tanto faz na verdade"
+//            )
+//            list += item
+//        }
+//        return list
+//    }
     //Use onSaveInstanceState(Bundle) and onRestoreInstanceState
 
     //Use onSaveInstanceState(Bundle) and onRestoreInstanceState
