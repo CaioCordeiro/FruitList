@@ -30,7 +30,8 @@ class FruitAdapter(private val fruitList: List<Fruit>, private val listener: OnI
 
     override fun getItemCount() = fruitList.size
 
-    inner class FruitViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class FruitViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener {
         val imageView: ImageView = itemView.image_view
         val textViewName: TextView = itemView.text_view_name
         val textViewSummary: TextView = itemView.text_view_summary

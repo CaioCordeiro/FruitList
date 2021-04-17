@@ -4,19 +4,23 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 //import javax.management.ObjectName
 import kotlin.random.Random
 
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
     companion object {
         const val MAIN_ACTIVITY_INSERT_FRUIT_REQUEST_CODE = 1
-        const val MAIN_ACTIVITY_DELETE_FRUIT_REQUEST_CODE = 2
         const val MAIN_ACTIVITY_EDIT_FRUIT_REQUEST_CODE = 2
         const val MAIN_ACTIVITY_EDIT_FRUIT_POSITION_EXTRA = "position"
         const val MAIN_ACTIVITY_EDIT_FRUIT_NAME_EXTRA = "name"
@@ -24,11 +28,9 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
         const val MAIN_ACTIVITY_EDIT_FRUIT_BENEFITS_EXTRA = "benefits"
         const val MAIN_ACTIVITY_EDIT_FRUIT_IMAGE_RESOURCE_EXTRA = "image_resource"
 
-        const val MAIN_ACTIVITY_INSERT_FRUIT_RESULT = "insert_fruit_extra"
     }
 
-    //    private val fruitList = generateDummyList(100)
-    private var fruitList = ArrayList<Fruit>()
+    private var fruitList = mutableListOf<Fruit>()
     private val adapter = FruitAdapter(fruitList, this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,10 +39,17 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
         recycle_view.adapter = adapter
         recycle_view.layoutManager = LinearLayoutManager(this)
         recycle_view.hasFixedSize()
+        val model = ViewModelProviders.of(this)[MainActivityViewModel::class.java]
         AddFruit.setOnClickListener {
             val createFruitActivity = Intent(this, CreateFruitActivity::class.java)
             startActivityForResult(createFruitActivity, MAIN_ACTIVITY_INSERT_FRUIT_REQUEST_CODE)
         }
+        model.getFruits().observe(this, Observer { fruitSnapshot ->
+            Log.i(TAG, "Received contacts from view model")
+            fruitList.clear()
+            fruitList.addAll(fruitSnapshot)
+            adapter.notifyDataSetChanged()
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -53,7 +62,7 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
                     val benefits = getStringExtra(CreateFruitActivity.RESULT_BENEFITS)
                     val imageResource = getStringExtra(CreateFruitActivity.RESULT_IMAGE_RESOURCE)
                     val uriImageResource = Uri.parse(imageResource)
-                    if (name != null && sumary != null&& benefits != null)
+                    if (name != null && sumary != null && benefits != null)
                         insertItem(uriImageResource, name, sumary, benefits)
                 }
             }
@@ -77,43 +86,53 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
         }
     }
 
-//    fun requestResult() {
-//
-//        startActivityForResult(CreateFruitActivity.newInstance(), MAIN_ACTIVITY_INSERT_FRUIT_REQUEST_CODE)
-//    }
-
-    fun insertItem(imageResource: Uri, name: String, summary: String, benefits: String) {
-//        val index = Random.nextInt(8)
-//        val newItem = Fruit(
-//            R.drawable.ic_baseline_widgets_24, "New item at position $index",
-//            "Fruta boa, tem gosto de tamarindo, mas tem cor de limão e parece de laranja"
-//        )
+    private fun insertItem(imageResource: Uri, name: String, summary: String, benefits: String) {
+        val model = ViewModelProviders.of(this)[MainActivityViewModel::class.java]
         val newItem = Fruit(
             imageResource,
             name,
             summary,
             benefits
         )
-        fruitList.add(0, newItem)
-        adapter.notifyItemInserted(0)
+        model.insertFruit(0, newItem).observe(this, Observer { fruitSnapshot ->
+            Log.i(TAG, "Received contacts from view model")
+            fruitList.clear()
+            fruitList.addAll(fruitSnapshot)
+            adapter.notifyItemInserted(0)
+        })
+
     }
 
-    fun removeItem(index: Int) {
-        fruitList.removeAt(index)
-        adapter.notifyItemRemoved(index)
+    private fun removeItem(index: Int) {
+        val model = ViewModelProviders.of(this)[MainActivityViewModel::class.java]
+        model.removeFruit(index).observe(this, Observer { fruitSnapshot ->
+            Log.i(TAG, "Received contacts from view model")
+            fruitList.clear()
+            fruitList.addAll(fruitSnapshot)
+            adapter.notifyItemRemoved(index)
+        })
     }
 
-    fun editItem(imageResource: Uri, name: String?, summary: String?, position: Int, benefits: String?) {
-        val clickedItem = fruitList[position]
-        if (name != null)
-            clickedItem.name = name
-        if (summary != null)
-            clickedItem.summary = summary
-        if (benefits != null)
-            clickedItem.benefits = benefits
-        if (imageResource != null)
-            clickedItem.imageResource = imageResource
-        adapter.notifyItemChanged(position)
+    private fun editItem(
+        imageResource: Uri,
+        name: String?,
+        summary: String?,
+        position: Int,
+        benefits: String?
+    ) {
+        val newItem = Fruit(
+            imageResource,
+            name!!,
+            summary!!,
+            benefits!!
+        )
+        val model = ViewModelProviders.of(this)[MainActivityViewModel::class.java]
+        model.editFruit(position, newItem).observe(this, Observer { fruitSnapshot ->
+            Log.i(TAG, "Received contacts from view model")
+            fruitList.clear()
+            fruitList.addAll(fruitSnapshot)
+            adapter.notifyItemChanged(position)
+        })
     }
 
     override fun onItemClick(position: Int) {
@@ -130,21 +149,5 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
             clickedItem.imageResource.toString()
         )
         startActivityForResult(editFruitActivity, MAIN_ACTIVITY_EDIT_FRUIT_REQUEST_CODE)
-    }
-    override fun onSaveInstanceState(savedInstanceState: Bundle) {
-
-        savedInstanceState.putParcelableArrayList("FruitList", fruitList)
-
-        super.onSaveInstanceState(savedInstanceState)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-
-        val check: ArrayList<Fruit>? = savedInstanceState.getParcelableArrayList("FruitList")
-        if (check != null) {
-            fruitList = check
-        }
-
     }
 }
