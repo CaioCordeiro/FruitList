@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_edit_fruit.*
-import kotlinx.android.synthetic.main.activity_edit_fruit.editTextFruitName
 
 
 class EditFruitActivity : AppCompatActivity() {
@@ -19,6 +18,7 @@ class EditFruitActivity : AppCompatActivity() {
         const val RESULT_IMAGE_RESOURCE = "image_resource"
         const val RESULT_NAME = "name"
         const val RESULT_SUMMARY = "summary"
+        const val RESULT_BENEFITS = "benefits"
         const val RESULT_POSITION = "position"
         const val RESULT_ACTION = "action"
         //image pick code
@@ -68,12 +68,13 @@ class EditFruitActivity : AppCompatActivity() {
         }
     }
 
-    fun returnEditResult(imageResource: Uri, name: String, summary: String, position: Int) {
+    fun returnEditResult(imageResource: Uri, name: String, summary: String, benefits: String, position: Int) {
         val data = Intent().apply {
             putExtra(RESULT_ACTION, "edit")
             putExtra(RESULT_IMAGE_RESOURCE, imageResource.toString())
             putExtra(RESULT_NAME, name)
             putExtra(RESULT_SUMMARY, summary)
+            putExtra(RESULT_BENEFITS, benefits)
             putExtra(RESULT_POSITION, position)
         }
         setResult(RESULT_OK, data)
@@ -95,12 +96,15 @@ class EditFruitActivity : AppCompatActivity() {
         val position = intent.getIntExtra(MainActivity.MAIN_ACTIVITY_EDIT_FRUIT_POSITION_EXTRA, 0)
         val imageResource =
             intent.getStringExtra(MainActivity.MAIN_ACTIVITY_EDIT_FRUIT_IMAGE_RESOURCE_EXTRA)
-        val uriImageResource = Uri.parse(imageResource)
+        newImageResource = Uri.parse(imageResource)
         val name = intent.getStringExtra(MainActivity.MAIN_ACTIVITY_EDIT_FRUIT_NAME_EXTRA)
         val summary = intent.getStringExtra(MainActivity.MAIN_ACTIVITY_EDIT_FRUIT_SUMMARY_EXTRA)
+        val benefits = intent.getStringExtra(MainActivity.MAIN_ACTIVITY_EDIT_FRUIT_BENEFITS_EXTRA)
         editTextFruitName.setText(name)
         editTextSummary.setText(summary)
-        imageEditView.setImageURI(uriImageResource)
+        editTextBenefits.setText(benefits)
+        imageEditView.setImageURI(newImageResource)
+
         imageEditButton.setOnClickListener {
             //check runtime permission
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -125,6 +129,7 @@ class EditFruitActivity : AppCompatActivity() {
                 newImageResource,
                 editTextFruitName.text.toString(),
                 editTextSummary.text.toString(),
+                editTextBenefits.text.toString(),
                 position
             )
         }

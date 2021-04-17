@@ -21,6 +21,7 @@ class CreateFruitActivity : AppCompatActivity() {
         const val RESULT_IMAGE_RESOURCE = "image_resource"
         const val RESULT_NAME = "name"
         const val RESULT_SUMMARY = "summary"
+        const val RESULT_BENEFITS = "benefits"
 
         //image pick code
         val IMAGE_PICK_CODE = 1000;
@@ -32,11 +33,12 @@ class CreateFruitActivity : AppCompatActivity() {
         fun newInstance(context: Context) = Intent(context, CreateFruitActivity::class.java)
     }
 
-    fun returnResult(imageResource: Uri, name: String, summary: String) {
+    fun returnResult(imageResource: Uri, name: String, summary: String, benefits: String) {
         val data = Intent().apply {
             putExtra(RESULT_IMAGE_RESOURCE, imageResource.toString())
             putExtra(RESULT_NAME, name)
             putExtra(RESULT_SUMMARY, summary)
+            putExtra(RESULT_BENEFITS, benefits)
         }
         setResult(RESULT_OK, data)
         finish()
@@ -104,7 +106,7 @@ class CreateFruitActivity : AppCompatActivity() {
         }
 
         createFruitButton.setOnClickListener {
-            returnResult(newImageResource , editTextFruitName.text.toString(), editTextFruitSummary.text.toString())
+            returnResult(newImageResource , editTextFruitName.text.toString(), editTextFruitSummary.text.toString(), editTextFruitBenefits.text.toString())
         }
 
 
