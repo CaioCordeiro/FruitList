@@ -10,6 +10,7 @@ import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import kotlinx.android.synthetic.main.activity_create_fruit.*
 
 
@@ -74,6 +75,9 @@ class CreateFruitActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_fruit)
+        setSupportActionBar(mainToolbar as Toolbar?);
+        supportActionBar?.title = "Adicionar Nova Fruit";
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         imageCreateButton.setOnClickListener {
             if (VERSION.SDK_INT >= VERSION_CODES.M) {

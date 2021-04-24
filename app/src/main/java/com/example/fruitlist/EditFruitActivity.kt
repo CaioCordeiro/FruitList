@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import kotlinx.android.synthetic.main.activity_edit_fruit.*
 
 
@@ -91,6 +92,7 @@ class EditFruitActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_fruit)
+
         val position = intent.getIntExtra(MainActivity.MAIN_ACTIVITY_EDIT_FRUIT_POSITION_EXTRA, 0)
         val imageResource =
             intent.getStringExtra(MainActivity.MAIN_ACTIVITY_EDIT_FRUIT_IMAGE_RESOURCE_EXTRA)
@@ -98,6 +100,9 @@ class EditFruitActivity : AppCompatActivity() {
         val name = intent.getStringExtra(MainActivity.MAIN_ACTIVITY_EDIT_FRUIT_NAME_EXTRA)
         val summary = intent.getStringExtra(MainActivity.MAIN_ACTIVITY_EDIT_FRUIT_SUMMARY_EXTRA)
         val benefits = intent.getStringExtra(MainActivity.MAIN_ACTIVITY_EDIT_FRUIT_BENEFITS_EXTRA)
+        setSupportActionBar(mainToolbar as Toolbar?);
+        supportActionBar?.title = name;
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         editTextFruitName.setText(name)
         editTextSummary.setText(summary)
         editTextBenefits.setText(benefits)

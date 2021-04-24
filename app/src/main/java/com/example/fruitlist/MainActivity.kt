@@ -1,20 +1,27 @@
 package com.example.fruitlist
 
+import android.R.*
 import android.app.Activity
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.View
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.tool_bar.*
+
+
 //import javax.management.ObjectName
-import kotlin.random.Random
 
 private const val TAG = "MainActivity"
 
@@ -36,9 +43,15 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        setSupportActionBar(mainToolBar as Toolbar?);
+        supportActionBar?.setDisplayShowTitleEnabled(false);
+        supportActionBar?.title = "Lista de Frutas";
+
+
         recycle_view.adapter = adapter
         recycle_view.layoutManager = LinearLayoutManager(this)
-        recycle_view.hasFixedSize()
+        recycle_view.setHasFixedSize(true)
         val model = ViewModelProviders.of(this)[MainActivityViewModel::class.java]
         AddFruit.setOnClickListener {
             val createFruitActivity = Intent(this, CreateFruitActivity::class.java)
@@ -99,6 +112,7 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
             fruitList.clear()
             fruitList.addAll(fruitSnapshot)
             adapter.notifyItemInserted(0)
+            recycle_view.scrollToPosition(0)
         })
 
     }
