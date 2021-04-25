@@ -75,9 +75,10 @@ class CreateFruitActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_fruit)
-        setSupportActionBar(mainToolbar as Toolbar?);
-        supportActionBar?.title = "Adicionar Nova Fruit";
+        setSupportActionBar(mainToolbar as Toolbar?)
+        supportActionBar?.title = "Adicionar Nova Fruit"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        newImageResource = Uri.EMPTY
 
         imageCreateButton.setOnClickListener {
             if (VERSION.SDK_INT >= VERSION_CODES.M) {

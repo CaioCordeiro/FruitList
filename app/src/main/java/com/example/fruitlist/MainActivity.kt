@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
 
     private var fruitList = mutableListOf<Fruit>()
     private val adapter = FruitAdapter(fruitList, this)
-
+    private var isListAlpha = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -52,17 +52,30 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
         recycle_view.adapter = adapter
         recycle_view.layoutManager = LinearLayoutManager(this)
         recycle_view.setHasFixedSize(true)
-        val model = ViewModelProviders.of(this)[MainActivityViewModel::class.java]
+
         AddFruit.setOnClickListener {
             val createFruitActivity = Intent(this, CreateFruitActivity::class.java)
             startActivityForResult(createFruitActivity, MAIN_ACTIVITY_INSERT_FRUIT_REQUEST_CODE)
         }
-        model.getFruits().observe(this, Observer { fruitSnapshot ->
-            Log.i(TAG, "Received contacts from view model")
-            fruitList.clear()
-            fruitList.addAll(fruitSnapshot)
-            adapter.notifyDataSetChanged()
-        })
+        menu_button.setOnClickListener {
+            val alertDialogBuilder = AlertDialog.Builder(this)
+            alertDialogBuilder.setTitle("Filter")
+            alertDialogBuilder.setNeutralButton("Sort Alpha") { dialog, which ->
+                Toast.makeText(applicationContext,
+                    "Sorted", Toast.LENGTH_SHORT).show()
+                this.sortAlpha()
+                isListAlpha = true
+            }
+            alertDialogBuilder.setNegativeButton("Sort Insertion") { dialog, which ->
+                Toast.makeText(applicationContext,
+                    "Sorted", Toast.LENGTH_SHORT).show()
+                this.getFruits()
+                isListAlpha = false
+            }
+            alertDialogBuilder.show()
+        }
+        this.getFruits()
+//        this.populateList()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -99,15 +112,36 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
         }
     }
 
-    private fun insertItem(imageResource: Uri, name: String, summary: String, benefits: String) {
+    private fun getFruits() {
         val model = ViewModelProviders.of(this)[MainActivityViewModel::class.java]
+        model.getFruits().observe(this, Observer { fruitSnapshot ->
+            Log.i(TAG, "Received contacts from view model")
+            fruitList.clear()
+            fruitList.addAll(fruitSnapshot)
+            adapter.notifyDataSetChanged()
+        })
+    }
+
+    private fun sortAlpha(){
+        val model = ViewModelProviders.of(this)[MainActivityViewModel::class.java]
+        model.getAlpha().observe(this, Observer { fruitSnapshot ->
+            Log.i(TAG, "Received contacts from view model")
+            fruitList.clear()
+            fruitList.addAll(fruitSnapshot)
+            adapter.notifyDataSetChanged()
+            recycle_view.scrollToPosition(0)
+        })
+    }
+
+    private fun insertItem(imageResource: Uri, name: String, summary: String, benefits: String) {
         val newItem = Fruit(
             imageResource,
             name,
             summary,
             benefits
         )
-        model.insertFruit(0, newItem).observe(this, Observer { fruitSnapshot ->
+        val model = ViewModelProviders.of(this)[MainActivityViewModel::class.java]
+        model.insertFruit(0, newItem, isListAlpha).observe(this, Observer { fruitSnapshot ->
             Log.i(TAG, "Received contacts from view model")
             fruitList.clear()
             fruitList.addAll(fruitSnapshot)
@@ -141,11 +175,15 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
             benefits!!
         )
         val model = ViewModelProviders.of(this)[MainActivityViewModel::class.java]
-        model.editFruit(position, newItem).observe(this, Observer { fruitSnapshot ->
+        model.editFruit(position, newItem, isListAlpha).observe(this, Observer { fruitSnapshot ->
             Log.i(TAG, "Received contacts from view model")
             fruitList.clear()
             fruitList.addAll(fruitSnapshot)
-            adapter.notifyItemChanged(position)
+            if(isListAlpha) {
+                adapter.notifyDataSetChanged()
+            } else {
+                adapter.notifyItemChanged(position)
+            }
         })
     }
 
@@ -163,5 +201,19 @@ class MainActivity : AppCompatActivity(), FruitAdapter.OnItemClickListener {
             clickedItem.imageResource.toString()
         )
         startActivityForResult(editFruitActivity, MAIN_ACTIVITY_EDIT_FRUIT_REQUEST_CODE)
+    }
+
+    fun populateList() {
+        this.insertItem(Uri.EMPTY, "CCCCCC", "É uma maçã1", "de fato uma maçã")
+        this.insertItem(Uri.EMPTY, "BBBBBB", "É uma maçã2", "de fato uma maçã1")
+        this.insertItem(Uri.EMPTY, "ZZZZZZ", "É uma maçã3", "de fato uma maçã2")
+        this.insertItem(Uri.EMPTY, "AAAAAA", "É uma maçã4", "de fato uma maçã3")
+//        this.insertItem(Uri.EMPTY, "Maçã4", "É uma maçã5", "de fato uma maçã4")
+//        this.insertItem(Uri.EMPTY, "Maçã5", "É uma maçã6", "de fato uma maçã5")
+//        this.insertItem(Uri.EMPTY, "Maçã6", "É uma maçã7", "de fato uma maçã6")
+//        this.insertItem(Uri.EMPTY, "Maçã7", "É uma maçã8", "de fato uma maçã7")
+//        this.insertItem(Uri.EMPTY, "Maçã8", "É uma maçã9", "de fato uma maçã8")
+//        this.insertItem(Uri.EMPTY, "Maçã9", "É uma maçã10", "de fato uma maçã9")
+
     }
 }
